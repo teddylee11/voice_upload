@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>음성파일 업로드 및 재생</title>
+  <title>음성파일 업로드 및 다운로드</title>
   <style>
     body {
       margin: 0;
@@ -20,6 +20,7 @@
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
       text-align: center;
+      width: 300px;
     }
 
     h1 {
@@ -36,49 +37,67 @@
     }
 
     audio {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       width: 100%;
+    }
+
+    .download-link {
+      display: none;
+      margin-bottom: 20px;
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎧 음성 파일 업로드 및 재생</h1>
+    <h1>🎧 음성 파일 업로드</h1>
 
     <!-- 선생님 구역 -->
     <h2>선생님 업로드</h2>
-    <input type="file" accept="audio/*" id="teacherAudioInput">
-    <br>
-    <audio id="teacherAudioPlayer" controls></audio>
+    <input type="file" accept="audio/*" id="teacherAudioInput"><br>
+    <audio id="teacherAudioPlayer" controls></audio><br>
+    <a id="teacherDownload" class="download-link" download>📥 다운로드</a>
 
     <!-- 학생 구역 -->
     <h2>학생 업로드</h2>
-    <input type="file" accept="audio/*" id="studentAudioInput">
-    <br>
-    <audio id="studentAudioPlayer" controls></audio>
+    <input type="file" accept="audio/*" id="studentAudioInput"><br>
+    <audio id="studentAudioPlayer" controls></audio><br>
+    <a id="studentDownload" class="download-link" download>📥 다운로드</a>
   </div>
 
   <script>
-    // 선생님
+    // 선생님 업로드
     const teacherInput = document.getElementById('teacherAudioInput');
     const teacherPlayer = document.getElementById('teacherAudioPlayer');
+    const teacherDownload = document.getElementById('teacherDownload');
+
     teacherInput.addEventListener('change', function () {
       const file = this.files[0];
       if (file) {
         const url = URL.createObjectURL(file);
         teacherPlayer.src = url;
+        teacherDownload.href = url;
+        teacherDownload.download = file.name;
+        teacherDownload.style.display = 'inline-block';
         teacherPlayer.play();
       }
     });
 
-    // 학생
+    // 학생 업로드
     const studentInput = document.getElementById('studentAudioInput');
     const studentPlayer = document.getElementById('studentAudioPlayer');
+    const studentDownload = document.getElementById('studentDownload');
+
     studentInput.addEventListener('change', function () {
       const file = this.files[0];
       if (file) {
         const url = URL.createObjectURL(file);
         studentPlayer.src = url;
+        studentDownload.href = url;
+        studentDownload.download = file.name;
+        studentDownload.style.display = 'inline-block';
         studentPlayer.play();
       }
     });
