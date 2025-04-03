@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>음성파일 업로드 및 재생</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    audio {
+      margin-bottom: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎧 음성 파일 업로드 및 재생</h1>
+
+    <!-- 선생님 구역 -->
+    <h2>선생님 업로드</h2>
+    <input type="file" accept="audio/*" id="teacherAudioInput">
+    <br>
+    <audio id="teacherAudioPlayer" controls></audio>
+
+    <!-- 학생 구역 -->
+    <h2>학생 업로드</h2>
+    <input type="file" accept="audio/*" id="studentAudioInput">
+    <br>
+    <audio id="studentAudioPlayer" controls></audio>
+  </div>
+
+  <script>
+    // 선생님
+    const teacherInput = document.getElementById('teacherAudioInput');
+    const teacherPlayer = document.getElementById('teacherAudioPlayer');
+    teacherInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        teacherPlayer.src = url;
+        teacherPlayer.play();
+      }
+    });
+
+    // 학생
+    const studentInput = document.getElementById('studentAudioInput');
+    const studentPlayer = document.getElementById('studentAudioPlayer');
+    studentInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        studentPlayer.src = url;
+        studentPlayer.play();
+      }
+    });
+  </script>
+</body>
+</html>
