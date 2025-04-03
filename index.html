@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>음성파일 업로드 및 다운로드</title>
+  <title>음성 업로드 및 녹음</title>
   <style>
     body {
       margin: 0;
@@ -13,37 +13,26 @@
       font-family: 'Arial', sans-serif;
       background-color: #f5f5f5;
     }
-
     .container {
       background: white;
-      padding: 40px;
+      padding: 30px;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 400px;
       text-align: center;
-      width: 300px;
     }
-
-    h1 {
-      margin-bottom: 30px;
+    h1 { margin-bottom: 30px; }
+    h2 { margin-top: 20px; margin-bottom: 10px; }
+    audio { width: 100%; margin: 10px 0; }
+    button, input[type="file"] {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+      cursor: pointer;
     }
-
-    h2 {
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-
-    input[type="file"] {
-      margin-bottom: 10px;
-    }
-
-    audio {
-      margin-bottom: 10px;
-      width: 100%;
-    }
-
     .download-link {
       display: none;
-      margin-bottom: 20px;
+      margin: 5px 0 20px;
       text-decoration: none;
       color: #007bff;
       font-weight: bold;
@@ -52,54 +41,73 @@
 </head>
 <body>
   <div class="container">
-    <h1>🎧 음성 파일 업로드</h1>
+    <h1>🎤 음성 업로드 및 녹음</h1>
 
-    <!-- 선생님 구역 -->
-    <h2>선생님 업로드</h2>
-    <input type="file" accept="audio/*" id="teacherAudioInput"><br>
-    <audio id="teacherAudioPlayer" controls></audio><br>
+    <!-- 선생님 영역 -->
+    <h2>👩‍🏫 선생님</h2>
+    <input type="file" accept="audio/*" id="teacherFile"><br>
+    <button onclick="startRecording('teacher')">녹음 시작</button>
+    <button onclick="stopRecording('teacher')">녹음 중지</button>
+    <audio id="teacherPlayer" controls></audio>
     <a id="teacherDownload" class="download-link" download>📥 다운로드</a>
 
-    <!-- 학생 구역 -->
-    <h2>학생 업로드</h2>
-    <input type="file" accept="audio/*" id="studentAudioInput"><br>
-    <audio id="studentAudioPlayer" controls></audio><br>
+    <!-- 학생 영역 -->
+    <h2>👨‍🎓 학생</h2>
+    <input type="file" accept="audio/*" id="studentFile"><br>
+    <button onclick="startRecording('student')">녹음 시작</button>
+    <button onclick="stopRecording('student')">녹음 중지</button>
+    <audio id="studentPlayer" controls></audio>
     <a id="studentDownload" class="download-link" download>📥 다운로드</a>
   </div>
 
   <script>
-    // 선생님 업로드
-    const teacherInput = document.getElementById('teacherAudioInput');
-    const teacherPlayer = document.getElementById('teacherAudioPlayer');
-    const teacherDownload = document.getElementById('teacherDownload');
+    const recorder = { teacher: null, student: null };
+    const chunks = { teacher: [], student: [] };
 
-    teacherInput.addEventListener('change', function () {
+    async function startRecording(who) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recorder[who] = new MediaRecorder(stream);
+      chunks[who] = [];
+
+      recorder[who].ondataavailable = e => chunks[who].push(e.data);
+      recorder[who].onstop = () => {
+        const blob = new Blob(chunks[who], { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        const player = document.getElementById(`${who}Player`);
+        const download = document.getElementById(`${who}Download`);
+
+        player.src = url;
+        download.href = url;
+        download.download = `${who}_recording.webm`;
+        download.style.display = 'inline-block';
+      };
+
+      recorder[who].start();
+    }
+
+    function stopRecording(who) {
+      if (recorder[who]) recorder[who].stop();
+    }
+
+    // 파일 업로드 재생 및 다운로드
+    document.getElementById('teacherFile').addEventListener('change', function () {
       const file = this.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        teacherPlayer.src = url;
-        teacherDownload.href = url;
-        teacherDownload.download = file.name;
-        teacherDownload.style.display = 'inline-block';
-        teacherPlayer.play();
-      }
+      const url = URL.createObjectURL(file);
+      document.getElementById('teacherPlayer').src = url;
+      const link = document.getElementById('teacherDownload');
+      link.href = url;
+      link.download = file.name;
+      link.style.display = 'inline-block';
     });
 
-    // 학생 업로드
-    const studentInput = document.getElementById('studentAudioInput');
-    const studentPlayer = document.getElementById('studentAudioPlayer');
-    const studentDownload = document.getElementById('studentDownload');
-
-    studentInput.addEventListener('change', function () {
+    document.getElementById('studentFile').addEventListener('change', function () {
       const file = this.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        studentPlayer.src = url;
-        studentDownload.href = url;
-        studentDownload.download = file.name;
-        studentDownload.style.display = 'inline-block';
-        studentPlayer.play();
-      }
+      const url = URL.createObjectURL(file);
+      document.getElementById('studentPlayer').src = url;
+      const link = document.getElementById('studentDownload');
+      link.href = url;
+      link.download = file.name;
+      link.style.display = 'inline-block';
     });
   </script>
 </body>
